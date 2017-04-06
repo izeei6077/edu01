@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="blacklistList">
+
+	<resultMap type="BlacklistListVO" id="blacklistList">
+		<result property="listID"         column="LIST_ID"      />
+		<result property="sender"         column="SENDER"       />
+		<result property="recName"        column="REC_NAME"     />
+		<result property="received"       column="RECEIVED"     />
+		<result property="instDate"       column="INST_DATE"    />
+	</resultMap>
+	
+	<sql id="blackListSQ">
+		<![CDATA[
+		SELECT 
+			LIST_ID
+			, SENDER
+			, REC_NAME
+			, RECEIVED
+			, INST_DATE
+		FROM BLACKLIST_LIST
+		]]>	
+	</sql>
+
+	<select id="selectBlacklistList" parameterType="BlacklistListVO" resultMap="blacklistList">
+ 	select *
+	      from (
+	              select rownum as rn, a.*
+	              from ( 
+        <include refid="blackListSQ" />
+        WHERE LIST_ID LIKE '%'||#{listID}||'%'
+		ORDER BY LIST_ID DESC
+ 			) a
+	          )
+	      where rownum <![CDATA[ <= ]]> #{pageSize}
+	          and rn <![CDATA[ > ]]>  (#{pageNo}-1) * #{pageSize} 
+    </select>
+
+    <select id="blacklistListCount" parameterType="BlacklistListVO" resultType="int">
+		select count(0) totalCnt
+		        from (
+		            <include refid="blackListSQ" />
+		WHERE LIST_ID LIKE '%'||#{listID}||'%'
+		ORDER BY LIST_ID DESC
+				)
+	</select>    
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
